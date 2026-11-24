@@ -22,7 +22,9 @@ class SmartBedsideSystem:
         GPIO.setmode(GPIO.BOARD)  # Refer to the GPIO pins by their physical number on the board.
         GPIO.setwarnings(False)  # Disable warnings.
 
-        self.spo2_hr_sensor = None  # Replace None by initializing the MAX30102 sensor (see User Story #1).
+        self.spo2_hr_sensor = DFRobot_BloodOxygen_S()  # Replace None by initializing the MAX30102 sensor (see User Story #1).
+        self.spo2_hr_sensor.begin()
+        self.spo2_hr_sensor.sensor_start_collect()
 
         self.alarm_on = None  # Replace None by initializing the alarm status (see User Story #2).
 
@@ -35,7 +37,11 @@ class SmartBedsideSystem:
         Returns: int: SpO₂ percentage (70–100).
         Raises: SmartBedsideError: If the sensor returns an invalid reading (-1).
         """
-        # See User Story #1.
+        ox_saturation= self.spo2_hr_sensor.get_spo2()
+        if ox_saturation == -1:
+            raise SmartBedsideError
+        else:
+            return ox_saturation
 
     def manage_alarm(self) -> None:
         """
