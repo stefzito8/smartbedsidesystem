@@ -31,9 +31,10 @@ class SmartBedsideSystem:
 
         GPIO.setup(self.BUTTON_PIN, GPIO.IN)
 
-
-        self.o2_servo = None  # Replace None by initializing the servo motor's PWM instance (see User Story #4).
-        self.o2_valve_angle = None  # Replace None by initializing the valve angle, in degrees (see User Story #4).
+        GPIO.setup(self.O2_SERVO_PIN, GPIO.OUT)
+        self.o2_servo = GPIO.PWM(self.O2_SERVO_PIN, 50)  # Replace None by initializing the servo motor's PWM instance (see User Story #4).
+        self.o2_servo.start(5.0)
+        self.o2_valve_angle = 0.0  # Replace None by initializing the valve angle, in degrees (see User Story #4).
 
     def read_vital_signs(self) -> int:
         """
@@ -75,6 +76,12 @@ class SmartBedsideSystem:
         Args: angle (float): The target valve angle in degrees, between 0 and 180 degrees, inclusive.
         Raises: SmartBedsideError: If the target angle is outside the valid range of 0 to 180 degrees.
         """
+        if  not (0.0 <= angle <= 180.0):
+            raise SmartBedsideError
+
+        duty_cycle = 5.0 + (angle / 180.0) * 5.0
+        self.o2_servo.ChangeDutyCycle(duty_cycle)
+        self.o2_valve_angle = angle
 
 
     def manage_oxygen_valve(self) -> None:
