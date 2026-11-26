@@ -110,9 +110,11 @@ class SmartBedsideSystem:
         Otherwise, fully close the oxygen delivery valve.
         Raises: SmartBedsideError: If the SpO₂ reading is invalid (propagated from read_vital_signs()).
         """
-        spo2 = self.read_vital_signs()
+        spo2 = self.read_vital_signs()[0]
 
-        if spo2 < 95:
+        if spo2 < 90:
             self.set_o2_valve_angle(180.0)
-        else:
+        elif 90 <= spo2 < 95:
+            self.set_o2_valve_angle(90.0)
+        elif spo2 >= 95:
             self.set_o2_valve_angle(0.0)
